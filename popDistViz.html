@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Population Pyramid</title>
+        <style>
+            .leftBox {
+                position: fixed;
+                background-color: rgb(125, 147, 243);
+                height: 20px;
+                width: 0px;
+                right: 50%;
+            }
+
+            .rightBox {
+                position: fixed;
+                background-color: rgb(255, 140, 140);
+                height: 20px;
+                width: 0px;
+                left: 50%;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="distBox">
+
+        </div>
+
+        <script>
+            var box = document.getElementById("distBox");
+
+            for (var i = 0; i < 10; i++) {
+                var newBar = document.createElement("div");
+                newBar.className = "leftBox";
+                newBar.style.top = (i * 22) + 100 + "px";
+                box.appendChild(newBar);
+
+                var newBar = document.createElement("div");
+                newBar.className = "rightBox";
+                newBar.style.top = (i * 22) + 100 + "px";
+                box.appendChild(newBar);
+            }
+
+            var lefts = document.getElementsByClassName("leftBox");
+            var rights = document.getElementsByClassName("rightBox");
+
+            /*
+            var leslieMatrix = [
+                [0,0,1,1.5,1.5,1,0,0,0,0],
+                [0.9,0,0,0,0,0,0,0,0,0],
+                [0,0.9,0,0,0,0,0,0,0,0],
+                [0,0,0.8,0,0,0,0,0,0,0],
+                [0,0,0,0.8,0,0,0,0,0,0],
+                [0,0,0,0,0.8,0,0,0,0,0],
+                [0,0,0,0,0,0.6,0,0,0,0],
+                [0,0,0,0,0,0,0.6,0,0,0],
+                [0,0,0,0,0,0,0,0.6,0,0],
+                [0,0,0,0,0,0,0,0,0.4,0]
+            ];
+            */
+           /*
+            var leslieMatrix = [
+                [0,0,1,1.5,1.5,1,0,0,0,0],
+                [0.4,0,0,0,0,0,0,0,0,0],
+                [0,0.3,0,0,0,0,0,0,0,0],
+                [0,0,0.9,0,0,0,0,0,0,0],
+                [0,0,0,0.9,0,0,0,0,0,0],
+                [0,0,0,0,0.6,0,0,0,0,0],
+                [0,0,0,0,0,0.3,0,0,0,0],
+                [0,0,0,0,0,0,0.4,0,0,0],
+                [0,0,0,0,0,0,0,0.2,0,0],
+                [0,0,0,0,0,0,0,0,0.1,0]
+            ];
+            */
+
+            // This one has eigenvalue 1
+            var leslieMatrix = [
+                [0,0,0,0.5,0.8,1.6,1.6,0.9,0,0],
+                [0.4,0,0,0,0,0,0,0,0,0],
+                [0,0.6,0,0,0,0,0,0,0,0],
+                [0,0,1.0,0,0,0,0,0,0,0],
+                [0,0,0,1.0,0,0,0,0,0,0],
+                [0,0,0,0,0.83333333,0,0,0,0,0],
+                [0,0,0,0,0,0.74,0,0,0,0],
+                [0,0,0,0,0,0,1.0,0,0,0],
+                [0,0,0,0,0,0,0,0.8,0,0],
+                [0,0,0,0,0,0,0,0,0.4,0]
+            ];
+
+            //This one has eigenvalue 1.2
+            /*
+            for (var i = 0; i < 10; i++) {
+                for (var j = 0; j< 10; j++) {
+                    leslieMatrix[i][j] *= 1.2;
+                }
+            }
+            */
+
+            //This one has eigenvalue 0.8
+
+            for (var i = 0; i < 10; i++) {
+                for (var j = 0; j< 10; j++) {
+                    leslieMatrix[i][j] *= 0.8;
+                }
+            }
+
+
+
+            /*
+            var startVec = [
+                3,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ];
+            */
+            
+            
+            var startVec = [
+                .3,
+                .3,
+                .3,
+                .3,
+                .3,
+                .3,
+                .3,
+                .3,
+                .3,
+                .3
+            ];
+            
+           /*
+            var startVec = [
+                .1,
+                .2,
+                .3,
+                .4,
+                .5,
+                .6,
+                .7,
+                .8,
+                .9,
+                1.0
+            ];
+            */
+            
+
+            var runMatrixMath = function() {
+                var outVec = [0,0,0,0,0,0,0,0,0,0];
+                for (var i = 0; i < 10; i++) {
+                    for (var j = 0; j < 10; j++) {
+                        outVec[i] += leslieMatrix[i][j] * startVec[j];
+                    }
+                }
+
+                for (var i = 0; i < 10; i++) {
+                    startVec[i] = outVec[i];
+                }
+            }
+
+            var normalizeMatrix = function() {
+                var sumVecVals = 0;
+                for (var i = 0; i < 10; i++) {
+                    sumVecVals += startVec[i];
+                }
+                for (var i = 0; i < 10; i++) {
+                    startVec[i] /= sumVecVals;
+                }
+            }
+
+            var nextTimestep = function() {
+                runMatrixMath();
+                normalizeMatrix();
+
+                for (var i = 0; i < 10; i++) {
+                    lefts[i].style.width = 300 * startVec[9 - i] + "px";
+                    rights[i].style.width = 300 * startVec[9 - i] + "px";
+                }
+            }
+            setInterval(nextTimestep, 100);
+        </script>
+
+    </body>
+</html>
